@@ -19,4 +19,4 @@ RUN python manage.py collectstatic --noinput
 ENV PORT=8000
 EXPOSE 8000
 
-CMD gunicorn vanguard_backend.wsgi:application --bind 0.0.0.0:${PORT} --workers 2 --timeout 60
+CMD ["sh", "-c", "python manage.py migrate --noinput && gunicorn vanguard_backend.wsgi:application --bind 0.0.0.0:${PORT:-8000} --workers 2 --timeout 60"]
