@@ -4,8 +4,16 @@ from django.contrib import admin
 from django.urls import path
 
 from content import views
+from django.http import JsonResponse
+
+
+def health(_request):
+    return JsonResponse({"ok": True, "service": "vanguard-back"})
+
 
 urlpatterns = [
+    path("", health),
+    path("health/", health),
     path("admin/", admin.site.urls),
     # Public
     path("api/services/", views.services_list),
@@ -30,5 +38,5 @@ urlpatterns = [
     path("api/admin/media/<int:pk>/", views.admin_media_detail),
 ]
 
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+# Serve uploads in prod too (no object storage yet).
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

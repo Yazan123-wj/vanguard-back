@@ -1,11 +1,10 @@
 """
 Django settings for the Vanguard content backend.
-
-Local dev: Postgres on localhost, media stored on disk, admin at /admin/.
 """
 
 import os
 from pathlib import Path
+from urllib.parse import urlparse
 
 from django.templatetags.static import static
 from django.urls import reverse_lazy
@@ -19,7 +18,19 @@ SECRET_KEY = os.environ.get(
 
 DEBUG = os.environ.get("DJANGO_DEBUG", "1") == "1"
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
+# Comma-separated hosts, or "*" when unset in production platforms.
+_raw_hosts = os.environ.get("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1")
+ALLOWED_HOSTS = [h.strip() for h in _raw_hosts.split(",") if h.strip()]
+if os.environ.get("RAILWAY_PUBLIC_DOMAIN"):
+    ALLOWED_HOSTS.append(os.environ["RAILWAY_PUBLIC_DOMAIN"])
+if os.environ.get("RENDER_EXTERNAL_HOSTNAME"):
+    ALLOWED_HOSTS.append(os.environ["RENDER_EXTERNAL_HOSTNAME"])
+
+CSRF_TRUSTED_ORIGINS = [
+    o.strip()
+    for o in os.environ.get("DJANGO_CSRF_TRUSTED_ORIGINS", "").split(",")
+    if o.strip()
+]
 
 INSTALLED_APPS = [
     "unfold",
@@ -39,6 +50,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -67,16 +79,41 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "vanguard_backend.wsgi.application"
 
-DATABASES = {
-    "default": {
+
+def _database_from_url(url: str) -> dict:
+    parsed = urlparse(url)
+    return {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.environ.get("POSTGRES_DB", "vanguard"),
-        "USER": os.environ.get("POSTGRES_USER", os.environ.get("USER", "")),
-        "PASSWORD": os.environ.get("POSTGRES_PASSWORD", ""),
-        "HOST": os.environ.get("POSTGRES_HOST", "localhost"),
-        "PORT": os.environ.get("POSTGRES_PORT", "5432"),
+        "NAME": parsed.path.lstrip("/") or "vanguard",
+        "USER": parsed.username or "",
+        "PASSWORD": parsed.password or "",
+        "HOST": parsed.hostname or "",
+        "PORT": str(parsed.port or 5432),
     }
-}
+
+
+_database_url = os.environ.get("DATABASE_URL", "").strip()
+if _database_url:
+    DATABASES = {"default": _database_from_url(_database_url)}
+elif os.environ.get("POSTGRES_HOST") or os.environ.get("POSTGRES_DB"):
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": os.environ.get("POSTGRES_DB", "vanguard"),
+            "USER": os.environ.get("POSTGRES_USER", os.environ.get("USER", "")),
+            "PASSWORD": os.environ.get("POSTGRES_PASSWORD", ""),
+            "HOST": os.environ.get("POSTGRES_HOST", "localhost"),
+            "PORT": os.environ.get("POSTGRES_PORT", "5432"),
+        }
+    }
+else:
+    # Local / simple deploys without managed Postgres.
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
+    }
 
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
@@ -92,19 +129,33 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
+    },
+}
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# The Next.js frontend (dev) consumes the API.
-CORS_ALLOWED_ORIGINS = [
+_default_cors = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
     "http://localhost:3010",
     "http://127.0.0.1:3010",
+    "https://vanguard-front-chi.vercel.app",
 ]
+_extra_cors = [
+    o.strip()
+    for o in os.environ.get("CORS_ALLOWED_ORIGINS", "").split(",")
+    if o.strip()
+]
+CORS_ALLOWED_ORIGINS = list(dict.fromkeys([*_default_cors, *_extra_cors]))
 CORS_ALLOW_HEADERS = [
     "accept",
     "authorization",
@@ -115,7 +166,6 @@ CORS_ALLOW_HEADERS = [
     "x-admin-token",
 ]
 
-# Shared secret for Next.js admin write routes (local/dev default).
 ADMIN_API_TOKEN = os.environ.get("ADMIN_API_TOKEN", "vanguard-admin-dev")
 
 REST_FRAMEWORK = {
@@ -125,27 +175,30 @@ REST_FRAMEWORK = {
     "UNAUTHENTICATED_USER": None,
 }
 
-# ── Unfold admin theme ──────────────────────────────────────────────────────
+if not DEBUG:
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+
+SITE_PUBLIC_URL = os.environ.get("SITE_PUBLIC_URL", "http://localhost:3000")
+
 UNFOLD = {
     "SITE_TITLE": "Vanguard Admin",
     "SITE_HEADER": "Vanguard",
     "SITE_SUBHEADER": "Website content",
-    "SITE_URL": "http://localhost:3000",
+    "SITE_URL": SITE_PUBLIC_URL,
     "SITE_SYMBOL": "bolt",
     "SHOW_HISTORY": True,
     "SHOW_VIEW_ON_SITE": False,
     "THEME": "light",
     "DASHBOARD_CALLBACK": "content.dashboard.dashboard_callback",
-    # CSS is also injected in templates/admin/base.html extrastyle (after Unfold).
     "STYLES": [],
     "SCRIPTS": [
-        # Clears persisted dark mode from Alpine localStorage.
         lambda request: static("admin/vanguard-force-light.js"),
     ],
     "LOGIN": {
         "redirect_after": lambda request: reverse_lazy("admin:index"),
     },
-    # Clean SaaS blue (matches the reference dashboard).
     "COLORS": {
         "primary": {
             "50": "239 246 255",

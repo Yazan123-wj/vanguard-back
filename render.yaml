@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: vanguard-back
+    runtime: python
+    plan: free
+    rootDir: .
+    buildCommand: pip install -r requirements.txt && python manage.py collectstatic --noinput
+    startCommand: gunicorn vanguard_backend.wsgi:application --bind 0.0.0.0:$PORT --workers 2 --timeout 60
+    envVars:
+      - key: DJANGO_DEBUG
+        value: "0"
+      - key: DJANGO_SECRET_KEY
+        generateValue: true
+      - key: DJANGO_ALLOWED_HOSTS
+        value: ".onrender.com"
+      - key: ADMIN_API_TOKEN
+        generateValue: true
+      - key: SITE_PUBLIC_URL
+        value: https://vanguard-front-chi.vercel.app
+      - key: CORS_ALLOWED_ORIGINS
+        value: https://vanguard-front-chi.vercel.app
+      - key: PYTHON_VERSION
+        value: "3.12.8"
