@@ -1,0 +1,518 @@
+/*
+ * Vanguard Admin — light SaaS theme.
+ * Always light (soft gray canvas + white cards). No navy / dark shell.
+ */
+
+:root,
+html,
+html.light,
+html.dark {
+  --vg-canvas: #f4f6f9;
+  --vg-card: #ffffff;
+  --vg-border: #e8ecf1;
+  --vg-text: #0f172a;
+  --vg-muted: #64748b;
+  --vg-blue: #2563eb;
+  --vg-blue-soft: #eff6ff;
+  --vg-shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 8px 24px rgba(15, 23, 42, 0.04);
+  --vg-radius: 12px;
+  color-scheme: light !important;
+}
+
+/* Full page canvas — no nested white shell */
+html,
+html.light,
+html.dark,
+html body,
+html.dark body {
+  background: var(--vg-canvas) !important;
+  color: var(--vg-text) !important;
+}
+
+#page.vg-page,
+.vg-page {
+  background: var(--vg-canvas) !important;
+}
+
+/* Main column = same gray as page (not a white card) */
+#main,
+#main.vg-main,
+#main.bg-white,
+html #main,
+html.dark #main {
+  background: var(--vg-canvas) !important;
+  background-color: var(--vg-canvas) !important;
+  color: var(--vg-text) !important;
+  border: none !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+}
+
+/* Content wrappers — fully transparent, never a white card */
+.vg-content-shell,
+#content,
+#content.vg-content,
+#content.container,
+#content.colM {
+  background: transparent !important;
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  max-width: none !important;
+}
+
+/* Sidebar — white panel */
+html aside,
+html.dark aside,
+html #nav-sidebar,
+html.dark #nav-sidebar,
+html [data-sidebar],
+html.dark [data-sidebar] {
+  background: #ffffff !important;
+  border-color: var(--vg-border) !important;
+  color: var(--vg-text) !important;
+}
+
+/* Top bar — same gray as page (no white band / hard cut) */
+.vg-topbar,
+#main > .bg-white.border-b,
+#main > .vg-topbar,
+html header,
+html.dark header {
+  background: var(--vg-canvas) !important;
+  background-color: var(--vg-canvas) !important;
+  border-color: var(--vg-border) !important;
+  color: var(--vg-text) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  margin-bottom: 0 !important;
+}
+
+/* Dashboard title area must never sit on a white slab */
+.vg-dash,
+.vg-dash__hero,
+.vg-dash__hero > div {
+  background: transparent !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+/* Soften Unfold dark utility backgrounds that leak through */
+html.dark .dark\:bg-base-900,
+html.dark .dark\:bg-base-950,
+html.dark .bg-base-900,
+html.dark .bg-base-950 {
+  background-color: var(--vg-canvas) !important;
+}
+
+html.dark .dark\:border-base-800,
+html.dark .dark\:border-base-700 {
+  border-color: var(--vg-border) !important;
+}
+
+html.dark .dark\:text-font-default-dark,
+html.dark .dark\:text-base-100,
+html.dark .dark\:text-base-200,
+html.dark .dark\:text-base-300 {
+  color: var(--vg-text) !important;
+}
+
+html.dark .dark\:text-base-400,
+html.dark .dark\:text-base-500 {
+  color: var(--vg-muted) !important;
+}
+
+/* Only the actual data table is a white card — not the whole page */
+html #changelist-form .results,
+html #changelist .results,
+html.dark #changelist-form .results,
+html.dark #changelist .results {
+  background: var(--vg-card) !important;
+  border: 1px solid var(--vg-border) !important;
+  border-radius: var(--vg-radius);
+  box-shadow: var(--vg-shadow);
+  overflow: hidden;
+}
+
+/* Change form fieldsets as light cards */
+html .aligned,
+html fieldset.module,
+html.dark fieldset.module {
+  background: var(--vg-card) !important;
+  border: 1px solid var(--vg-border) !important;
+  border-radius: var(--vg-radius) !important;
+  box-shadow: var(--vg-shadow);
+}
+
+html input[type="text"],
+html input[type="search"],
+html input[type="email"],
+html input[type="url"],
+html input[type="password"],
+html input[type="number"],
+html textarea,
+html select,
+html.dark input[type="text"],
+html.dark input[type="search"],
+html.dark input[type="email"],
+html.dark input[type="url"],
+html.dark input[type="password"],
+html.dark input[type="number"],
+html.dark textarea,
+html.dark select {
+  border-radius: 10px !important;
+  background: #ffffff !important;
+  color: var(--vg-text) !important;
+  border-color: var(--vg-border) !important;
+}
+
+/* ── Custom dashboard ───────────────────────────────────────────────────── */
+.vg-dash {
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+  padding-bottom: 2rem;
+}
+
+.vg-dash__hero {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.vg-dash__eyebrow {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--vg-blue);
+  margin: 0 0 0.35rem;
+}
+
+.vg-dash__title {
+  margin: 0;
+  font-size: clamp(1.75rem, 3vw, 2.15rem);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--vg-text);
+  line-height: 1.15;
+}
+
+.vg-dash__subtitle {
+  margin: 0.4rem 0 0;
+  color: var(--vg-muted);
+  font-size: 0.95rem;
+  max-width: 42ch;
+}
+
+.vg-dash__hero-actions {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.vg-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.6rem 1rem;
+  border-radius: 10px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none !important;
+  transition: background 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.vg-btn--primary {
+  background: var(--vg-blue);
+  color: #fff !important;
+  box-shadow: 0 1px 2px rgba(37, 99, 235, 0.3);
+}
+
+.vg-btn--primary:hover {
+  background: #1d4ed8;
+  transform: translateY(-1px);
+}
+
+.vg-btn--ghost {
+  background: #fff;
+  color: var(--vg-text) !important;
+  border: 1px solid var(--vg-border);
+}
+
+.vg-btn--ghost:hover {
+  border-color: #cbd5e1;
+  background: #f8fafc;
+}
+
+.vg-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+@media (max-width: 1100px) {
+  .vg-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .vg-stats {
+    grid-template-columns: 1fr;
+  }
+}
+
+.vg-stat {
+  display: block;
+  background: var(--vg-card);
+  border: 1px solid var(--vg-border);
+  border-radius: var(--vg-radius);
+  padding: 1.15rem 1.25rem;
+  box-shadow: var(--vg-shadow);
+  text-decoration: none !important;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+  color: inherit;
+}
+
+.vg-stat:hover {
+  border-color: #c7d2fe;
+  box-shadow: 0 4px 20px rgba(37, 99, 235, 0.08);
+  transform: translateY(-2px);
+}
+
+.vg-stat__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.85rem;
+}
+
+.vg-stat__icon {
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  background: var(--vg-blue-soft);
+  color: var(--vg-blue);
+  font-size: 1.25rem !important;
+}
+
+.vg-stat__icon.tone-indigo {
+  background: #eef2ff;
+  color: #4f46e5;
+}
+.vg-stat__icon.tone-violet {
+  background: #f5f3ff;
+  color: #7c3aed;
+}
+.vg-stat__icon.tone-sky {
+  background: #e0f2fe;
+  color: #0284c7;
+}
+
+.vg-stat__value {
+  font-size: 1.85rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--vg-text);
+  line-height: 1;
+}
+
+.vg-stat__label {
+  margin-top: 0.35rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--vg-text);
+}
+
+.vg-stat__hint {
+  margin-top: 0.2rem;
+  font-size: 0.78rem;
+  color: var(--vg-muted);
+}
+
+.vg-grid {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 1rem;
+}
+
+@media (max-width: 960px) {
+  .vg-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.vg-panel {
+  background: var(--vg-card);
+  border: 1px solid var(--vg-border);
+  border-radius: var(--vg-radius);
+  box-shadow: var(--vg-shadow);
+  overflow: hidden;
+}
+
+.vg-panel__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--vg-border);
+}
+
+.vg-panel__title {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--vg-text);
+}
+
+.vg-panel__link {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--vg-blue) !important;
+  text-decoration: none !important;
+}
+
+.vg-panel__body {
+  padding: 0.5rem 0;
+}
+
+.vg-row {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.75rem 1.25rem;
+  text-decoration: none !important;
+  color: inherit;
+  transition: background 0.12s ease;
+}
+
+.vg-row:hover {
+  background: #f8fafc;
+}
+
+.vg-row__avatar {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #dbeafe, #eff6ff);
+  color: var(--vg-blue);
+  display: grid;
+  place-items: center;
+  font-size: 1rem !important;
+  flex-shrink: 0;
+}
+
+.vg-row__meta {
+  min-width: 0;
+  flex: 1;
+}
+
+.vg-row__title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--vg-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.vg-row__sub {
+  font-size: 0.75rem;
+  color: var(--vg-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.vg-row__badge {
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  background: var(--vg-blue-soft);
+  color: var(--vg-blue);
+  flex-shrink: 0;
+}
+
+.vg-actions {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.85rem;
+}
+
+@media (max-width: 1100px) {
+  .vg-actions {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .vg-actions {
+    grid-template-columns: 1fr;
+  }
+}
+
+.vg-action {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  background: var(--vg-card);
+  border: 1px solid var(--vg-border);
+  border-radius: var(--vg-radius);
+  padding: 1.1rem 1.15rem;
+  box-shadow: var(--vg-shadow);
+  text-decoration: none !important;
+  transition: border-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.vg-action:hover {
+  border-color: #93c5fd;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(37, 99, 235, 0.08);
+}
+
+.vg-action__icon {
+  width: 2.2rem;
+  height: 2.2rem;
+  border-radius: 9px;
+  background: var(--vg-blue-soft);
+  color: var(--vg-blue);
+  display: grid;
+  place-items: center;
+  font-size: 1.15rem !important;
+  margin-bottom: 0.35rem;
+}
+
+.vg-action__title {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--vg-text);
+}
+
+.vg-action__desc {
+  font-size: 0.78rem;
+  color: var(--vg-muted);
+  line-height: 1.4;
+}
+
+.vg-empty {
+  padding: 1.5rem 1.25rem;
+  color: var(--vg-muted);
+  font-size: 0.875rem;
+}
+
+/* Login — light soft wash, no navy */
+html body:has(#login-form),
+html.dark body:has(#login-form) {
+  background:
+    radial-gradient(1200px 600px at 10% -10%, #dbeafe 0%, transparent 55%),
+    radial-gradient(900px 500px at 100% 0%, #e0e7ff 0%, transparent 50%),
+    var(--vg-canvas) !important;
+}

@@ -1,0 +1,104 @@
+{% extends 'admin/base.html' %}
+{% load i18n %}
+
+{% block title %}{% if subtitle %}{{ subtitle }} | {% endif %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
+
+{% block branding %}
+    {% include "unfold/helpers/site_branding.html" %}
+{% endblock %}
+
+{% block content %}
+<div class="vg-dash">
+    <header class="vg-dash__hero">
+        <div>
+            <p class="vg-dash__eyebrow">Vanguard CMS</p>
+            <h1 class="vg-dash__title">Website content</h1>
+            <p class="vg-dash__subtitle">
+                Edit services, projects, blogs, and the footer. Changes show up on the site after a refresh.
+            </p>
+        </div>
+        <div class="vg-dash__hero-actions">
+            <a class="vg-btn vg-btn--ghost" href="http://localhost:3000" target="_blank" rel="noreferrer">
+                <span class="material-symbols-outlined" style="font-size:1.1rem">open_in_new</span>
+                View website
+            </a>
+            <a class="vg-btn vg-btn--primary" href="{% url 'admin:content_project_add' %}">
+                <span class="material-symbols-outlined" style="font-size:1.1rem">add</span>
+                Add project
+            </a>
+        </div>
+    </header>
+
+    <section class="vg-stats" aria-label="Content stats">
+        {% for stat in vg_stats %}
+        <a class="vg-stat" href="{{ stat.href }}">
+            <div class="vg-stat__top">
+                <span class="material-symbols-outlined vg-stat__icon tone-{{ stat.tone }}">{{ stat.icon }}</span>
+            </div>
+            <div class="vg-stat__value">{{ stat.value }}</div>
+            <div class="vg-stat__label">{{ stat.label }}</div>
+            <div class="vg-stat__hint">{{ stat.hint }}</div>
+        </a>
+        {% endfor %}
+    </section>
+
+    <section aria-label="Quick actions">
+        <div class="vg-actions">
+            {% for action in vg_quick_actions %}
+            <a
+                class="vg-action"
+                href="{{ action.href }}"
+                {% if action.external %}target="_blank" rel="noreferrer"{% endif %}
+            >
+                <span class="material-symbols-outlined vg-action__icon">{{ action.icon }}</span>
+                <span class="vg-action__title">{{ action.title }}</span>
+                <span class="vg-action__desc">{{ action.description }}</span>
+            </a>
+            {% endfor %}
+        </div>
+    </section>
+
+    <section class="vg-grid" aria-label="Recent content">
+        <div class="vg-panel">
+            <div class="vg-panel__head">
+                <h2 class="vg-panel__title">Recent projects</h2>
+                <a class="vg-panel__link" href="{% url 'admin:content_project_changelist' %}">View all</a>
+            </div>
+            <div class="vg-panel__body">
+                {% for project in vg_recent_projects %}
+                <a class="vg-row" href="{% url 'admin:content_project_change' project.id %}">
+                    <span class="material-symbols-outlined vg-row__avatar">image</span>
+                    <div class="vg-row__meta">
+                        <div class="vg-row__title">{{ project.title }}</div>
+                        <div class="vg-row__sub">{{ project.subtitle }}</div>
+                    </div>
+                    <span class="vg-row__badge">{{ project.date|date:"Y" }}</span>
+                </a>
+                {% empty %}
+                <p class="vg-empty">No projects yet. Add your first one.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="vg-panel">
+            <div class="vg-panel__head">
+                <h2 class="vg-panel__title">Recent blog posts</h2>
+                <a class="vg-panel__link" href="{% url 'admin:content_blogpost_changelist' %}">View all</a>
+            </div>
+            <div class="vg-panel__body">
+                {% for post in vg_recent_blogs %}
+                <a class="vg-row" href="{% url 'admin:content_blogpost_change' post.id %}">
+                    <span class="material-symbols-outlined vg-row__avatar">article</span>
+                    <div class="vg-row__meta">
+                        <div class="vg-row__title">{{ post.title }}</div>
+                        <div class="vg-row__sub">{{ post.category }} · {{ post.date|date:"M j, Y" }}</div>
+                    </div>
+                </a>
+                {% empty %}
+                <p class="vg-empty">No blog posts yet.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}

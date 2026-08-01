@@ -1,0 +1,8 @@
+Django>=6.0,<7.0
+djangorestframework>=3.16
+django-cors-headers>=4.9
+psycopg[binary]>=3.2
+Pillow>=11.0
+certifi
+django-unfold>=0.102
+django-import-export>=4.4
