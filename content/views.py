@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.contrib.auth import authenticate
 from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.decorators import api_view, parser_classes
@@ -38,6 +39,32 @@ def _admin_authorized(request) -> bool:
 
 def _deny():
     return Response({"detail": "Unauthorized"}, status=status.HTTP_401_UNAUTHORIZED)
+
+
+@api_view(["POST"])
+def admin_login(request):
+    """Verify Django staff credentials for the panel.
+
+    Still gated on X-Admin-Token so only the panel's own server can reach it —
+    that keeps the endpoint off the public internet as a brute-force target.
+    The panel exchanges a success here for its own signed session cookie; the
+    API token itself never reaches the browser.
+    """
+    if not _admin_authorized(request):
+        return _deny()
+    username = (request.data.get("username") or "").strip()
+    password = request.data.get("password") or ""
+    if not username or not password:
+        return Response(
+            {"detail": "Username and password are required."},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+    user = authenticate(username=username, password=password)
+    if user is None or not (user.is_staff or user.is_superuser):
+        return Response(
+            {"detail": "Invalid credentials."}, status=status.HTTP_401_UNAUTHORIZED
+        )
+    return Response({"ok": True, "username": user.get_username()})
 
 
 @api_view(["GET"])

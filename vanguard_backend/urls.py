@@ -22,6 +22,7 @@ urlpatterns = [
     path("api/blogs/", views.blogs_list),
     path("api/footer/", views.footer_detail),
     # Admin CMS
+    path("api/admin/login/", views.admin_login),
     path("api/admin/dashboard/", views.admin_dashboard),
     path("api/admin/blogs/", views.admin_blogs),
     path("api/admin/blogs/<slug:slug>/", views.admin_blog_detail),
