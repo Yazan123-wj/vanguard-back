@@ -1,7 +1,8 @@
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, re_path
+from django.views.static import serve as _serve
 
 from content import views
 from django.http import JsonResponse
@@ -39,4 +40,14 @@ urlpatterns = [
 ]
 
 # Serve uploads in prod too (no object storage yet).
+# django.conf.urls.static.static() is a no-op when DEBUG=False, so route media
+# explicitly — otherwise every uploaded image 404s in production.
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+if not settings.DEBUG:
+    urlpatterns += [
+        re_path(
+            r"^media/(?P<path>.*)$",
+            _serve,
+            {"document_root": settings.MEDIA_ROOT},
+        ),
+    ]

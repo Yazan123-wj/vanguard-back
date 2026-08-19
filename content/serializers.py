@@ -216,6 +216,10 @@ class AdminServiceSerializer(serializers.ModelSerializer):
     defineItems = serializers.JSONField(required=False, write_only=True)
     workSteps = serializers.JSONField(required=False, write_only=True)
     leaveWith = serializers.JSONField(required=False, write_only=True)
+    # Lets the first section keep its own heading ("What we design/build/plan").
+    defineHeading = serializers.CharField(
+        source="what_we_define_heading", required=False, allow_blank=True
+    )
     projectCount = serializers.SerializerMethodField()
     updatedAt = serializers.SerializerMethodField()
 
@@ -233,6 +237,7 @@ class AdminServiceSerializer(serializers.ModelSerializer):
             "defineItems",
             "workSteps",
             "leaveWith",
+            "defineHeading",
             "projectCount",
             "updatedAt",
         ]
@@ -249,6 +254,7 @@ class AdminServiceSerializer(serializers.ModelSerializer):
             "tags": instance.tag_list,
             "status": instance.status,
             "order": instance.order,
+            "defineHeading": instance.what_we_define_heading,
             "defineItems": blocks.get("defineItems") or [],
             "workSteps": blocks.get("workSteps") or [],
             "leaveWith": blocks.get("leaveWith")
